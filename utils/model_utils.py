@@ -1,26 +1,17 @@
-import torch
-from models.stylegan3.model import Generator
-from models.face_parsing.model import BiSeNet
-import pickle
+import gdown
+import os
 
-def load_base_models2():
-    ckpt = "/content/gdrive/MyDrive/HairGAN/HairCLIP/pretrained_models/ffhq.pt"
-    g_ema = Generator(1024, 512, 8)
-    g_ema.load_state_dict(torch.load(ckpt)["g_ema"], strict=False)
-    g_ema.eval()
-    g_ema = g_ema.cuda()
 
-    mean_latent = torch.load(ckpt)["latent_avg"].unsqueeze(0).unsqueeze(0).repeat(1,18,1).clone().detach().cuda()
+weight_dic = {'afhqwild.pt': 'https://drive.google.com/file/d/14OnzO4QWaAytKXVqcfWo_o2MzoR4ygnr/view?usp=sharing',
+                'afhqdog.pt': 'https://drive.google.com/file/d/16v6jPtKVlvq8rg2Sdi3-R9qZEVDgvvEA/view?usp=sharing',
+                'afhqcat.pt': 'https://drive.google.com/file/d/1HXLER5R3EMI8DSYDBZafoqpX4EtyOf2R/view?usp=sharing',
+                'ffhq.pt': 'https://drive.google.com/file/d/1AT6bNR2ppK8f2ETL_evT27f3R_oyWNHS/view?usp=sharing',
+                'metfaces.pt': 'https://drive.google.com/file/d/16wM2PwVWzaMsRgPExvRGsq6BWw_muKbf/view?usp=sharing',
+                'seg.pth': 'https://drive.google.com/file/d/1lIKvQaFKHT5zC7uS4p17O9ZpfwmwlS62/view?usp=sharing'
 
-    seg_pretrained_path = "/content/gdrive/MyDrive/HairGAN/tam_proposed/seg.pth"
-    seg = BiSeNet(n_classes=16)
-    seg.load_state_dict(torch.load(seg_pretrained_path), strict=False)
-    for param in seg.parameters():
-        param.requires_grad = False
-    seg.eval()
-    seg = seg.cuda()
+}
 
-    return g_ema, mean_latent, seg
 
-def load_base_models3():
-    return
+def download_weight(weight_path):
+    gdown.download(weight_dic[os.path.basename(weight_path)],
+                   output=weight_path, fuzzy=True)
